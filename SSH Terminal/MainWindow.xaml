@@ -10,7 +10,7 @@
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding EnterCommand}"/>
     </Window.InputBindings>
-    
+
     <Grid Background="LightGray">
         <StackPanel Name="SSHConnector" VerticalAlignment="Top" Height="150" MaxWidth="800" MinWidth="790">
             <GroupBox Header="SSH Connector" Margin=" 4 0 4 0" Height="150">
@@ -34,18 +34,30 @@
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Width="400" HorizontalAlignment="Right" >
-                        <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" Height="20" Width="100">Connect</Button>
-                        <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" Margin="8 0 0 0" Height="20" Width="100">Disconnect</Button>
+                        <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" HorizontalAlignment="Center" Height="20" Width="100">Connect</Button>
+                        <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="100">Disconnect</Button>
+                        <Button VerticalAlignment="Bottom" Command="{Binding ListDirectoryCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="100">List Directory</Button>
                     </StackPanel>
                 </Grid>
             </GroupBox>
         </StackPanel>
 
         <StackPanel Name="TerminalWindow" VerticalAlignment="Bottom" Height="250">
-            <GroupBox Header="Terminal" Margin="4 0 4 0" Height="248">
+            <GroupBox Header="Terminal" FontWeight="Bold" Margin="4 0 4 0" Height="248">
                 <StackPanel FocusManager.FocusedElement="{Binding ElementName=Input}">
-                    <TextBox Text="{Binding Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="175" VerticalAlignment="Top" Margin="4 4 4 0"></TextBox>
-                    <TextBox Text="{Binding Input , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Name="Input" AcceptsReturn="False" VerticalAlignment="Bottom" Margin="4 10 4 0"></TextBox>
+                    <TextBox IsEnabled="true" 
+                             CaretIndex="0"
+                             Text="{Binding Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             TextWrapping="Wrap" 
+                             Height="175" 
+                             VerticalAlignment="Top" 
+                             Margin="4 4 4 0"
+                             FontWeight="Normal" 
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"></TextBox>
+                    
+                    <TextBox Text="{Binding Input , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Name="Input" 
+                        AcceptsReturn="False" VerticalAlignment="Bottom" Margin="4 10 4 0" FontWeight="Normal"></TextBox>
 
                     <Label Content="{Binding Status}" Margin="4 0 4 0" FontSize="11"></Label>
                 </StackPanel>

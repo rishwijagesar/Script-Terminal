@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +34,7 @@ namespace SSH_Terminal.ViewModel
             _userName = "rishwi";
             _portNumber = "22";
             Status = "Status : Not Connected";
-            ThreadStart threadStart = new ThreadStart(recvSSHData);
+            ThreadStart threadStart = new ThreadStart(RecvSSHData);
             Thread thread = new Thread(threadStart)
             {
                 IsBackground = true
@@ -42,17 +44,25 @@ namespace SSH_Terminal.ViewModel
             ConnectCommand = new RelayCommand(Connect);
             DisconnectCommand = new RelayCommand(Disconnect);
             EnterCommand = new RelayCommand(Enter);
+            ListDirectoryCommand = new RelayCommand(ListDirectory);
 
+        }
+
+        private void ListDirectory()
+        {
+            SshCommand command = _sshClient.CreateCommand("ls");
+            command.Execute();
+            Output += "\n";
+            Output += command.Result;
         }
 
         private void Enter()
         {
             try
             {
-                _shellStreamSSH.Write(Output+ "\n");
+                _shellStreamSSH.Write(Input+ "\n");
                 _shellStreamSSH.Flush();
-
-                Output = "";
+                Input = "";
             }
             catch
             {
@@ -63,7 +73,7 @@ namespace SSH_Terminal.ViewModel
         private void Disconnect()
         {
             _sshClient.Disconnect();
-            Output = "Disconnected from " + _address;
+            Output = "Disconnected from " + _address + "\n";
             Status = "Status: Not connected";
         }
 
@@ -76,8 +86,8 @@ namespace SSH_Terminal.ViewModel
                 this._sshClient.ConnectionInfo.Timeout = TimeSpan.FromSeconds(120);
                 this._sshClient.Connect();
 
-                this._shellStreamSSH = this._sshClient.CreateShellStream("vt100", 80, 60, 800, 600, 65536);
-                Status = "Status: Connected to " + Address;
+                this._shellStreamSSH = this._sshClient.CreateShellStream("xterm-256color", 80, 160, 80, 160, 1024);
+                Status = "Status: Connected to " + _address;
             }
             catch (Exception exp)
             {
@@ -86,7 +96,7 @@ namespace SSH_Terminal.ViewModel
             }
         }
 
-        private void recvSSHData()
+        private void RecvSSHData()
         {
             while (true)
             {
@@ -96,13 +106,11 @@ namespace SSH_Terminal.ViewModel
                     {
                         // read data from shellstream
                         string data = this._shellStreamSSH.Read();
-                        data = data.Replace("[01;34m", "");
-                        data = data.Replace("[00m", "");
-                        data = data.Replace("[m", "");
-                        data = data.Replace("[01;32m", "");
-                        data = data.Replace(" ", "");
 
-                        Output = data;
+                        // remove ansi color codes
+                        data =  new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(data, "");
+
+                        Output += data;
                         
                     }
                 }
@@ -110,7 +118,7 @@ namespace SSH_Terminal.ViewModel
                 {
 
                 }
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(200);
             }
         }
 
@@ -120,6 +128,7 @@ namespace SSH_Terminal.ViewModel
         public RelayCommand ConnectCommand { get; }
         public RelayCommand DisconnectCommand { get; }
         public RelayCommand EnterCommand { get; }
+        public RelayCommand ListDirectoryCommand { get; }
 
         public string Address
         {
