@@ -5,8 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SSH_Terminal"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="Script Terminal" Height="450" ResizeMode="NoResize" MaxHeight="450" Width="800" MaxWidth="800" 
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding EnterCommand}"/>
+    </Window.InputBindings>
+    
+    <Grid Background="LightGray">
+        <StackPanel Name="SSHConnector" VerticalAlignment="Top" Height="150" MaxWidth="800" MinWidth="790">
+            <GroupBox Header="SSH Connector" Margin=" 4 0 4 0" Height="150">
+                <Grid>
+                    <StackPanel Orientation="Vertical" Width="375" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
+                            <Label Content="Host Address :" Width="120"></Label>
+                            <TextBox Text="{Binding Address}" Width="150" Height="20" Name="HostAddress"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
+                            <Label Content="User Name :" Width="120"></Label>
+                            <TextBox Text="{Binding UserName}" Width="150" Height="20" Name="UserName"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
+                            <Label Content="Password :" Width="120"></Label>
+                            <TextBox Text="{Binding Password}" Width="150" Height="20" Name="Password" ></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
+                            <Label Content="Port Number :" Width="120"></Label>
+                            <TextBox Text="{Binding PortNumber}" Width="150" Height="20" Name="PortNumber"></TextBox>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Width="400" HorizontalAlignment="Right" >
+                        <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" Height="20" Width="100">Connect</Button>
+                        <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" Margin="8 0 0 0" Height="20" Width="100">Disconnect</Button>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+
+        <StackPanel Name="TerminalWindow" VerticalAlignment="Bottom" Height="250">
+            <GroupBox Header="Terminal" Margin="4 0 4 0" Height="248">
+                <StackPanel FocusManager.FocusedElement="{Binding ElementName=Input}">
+                    <TextBox Text="{Binding Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="175" VerticalAlignment="Top" Margin="4 4 4 0"></TextBox>
+                    <TextBox Text="{Binding Input , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Name="Input" AcceptsReturn="False" VerticalAlignment="Bottom" Margin="4 10 4 0"></TextBox>
+
+                    <Label Content="{Binding Status}" Margin="4 0 4 0" FontSize="11"></Label>
+                </StackPanel>
+
+            </GroupBox>
+        </StackPanel>
     </Grid>
 </Window>
