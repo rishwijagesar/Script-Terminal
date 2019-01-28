@@ -12,56 +12,77 @@
     </Window.InputBindings>
 
     <Grid Background="LightGray">
-        <StackPanel Name="SSHConnector" VerticalAlignment="Top" Height="150" MaxWidth="800" MinWidth="790">
-            <GroupBox Header="SSH Connector" Margin=" 4 0 4 0" Height="150">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="600"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Name="SSHConnector" Grid.Column="0" VerticalAlignment="Top" Height="150" MaxWidth="600" HorizontalAlignment="Left" MinWidth="600">
+            <GroupBox Header="SSH Connector" Margin=" 4 0 4 0" Height="150" FontWeight="Bold">
                 <Grid>
                     <StackPanel Orientation="Vertical" Width="375" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
-                            <Label Content="Host Address :" Width="120"></Label>
-                            <TextBox Text="{Binding Address}" Width="150" Height="20" Name="HostAddress"></TextBox>
+                            <Label Content="Host Address :" Width="120" FontWeight="Normal"></Label>
+                            <TextBox Text="{Binding Address}" FontWeight="Normal" Width="150" Height="20" Name="HostAddress"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
-                            <Label Content="User Name :" Width="120"></Label>
-                            <TextBox Text="{Binding UserName}" Width="150" Height="20" Name="UserName"></TextBox>
+                            <Label FontWeight="Normal" Content="User Name :" Width="120"></Label>
+                            <TextBox FontWeight="Normal" Text="{Binding UserName}" Width="150" Height="20" Name="UserName"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
-                            <Label Content="Password :" Width="120"></Label>
-                            <TextBox Text="{Binding Password}" Width="150" Height="20" Name="Password" ></TextBox>
+                            <Label FontWeight="Normal" Content="Password :" Width="120"></Label>
+                            <TextBox  FontWeight="Normal" Text="{Binding Password}" Width="150" Height="20" Name="Password" ></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
-                            <Label Content="Port Number :" Width="120"></Label>
-                            <TextBox Text="{Binding PortNumber}" Width="150" Height="20" Name="PortNumber"></TextBox>
+                            <Label  FontWeight="Normal" Content="Port Number :" Width="120"></Label>
+                            <TextBox  FontWeight="Normal" Text="{Binding PortNumber}" Width="150" Height="20" Name="PortNumber"></TextBox>
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Width="400" HorizontalAlignment="Right" >
-                        <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" HorizontalAlignment="Center" Height="20" Width="100">Connect</Button>
-                        <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="100">Disconnect</Button>
-                        <Button VerticalAlignment="Bottom" Command="{Binding ListDirectoryCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="100">List Directory</Button>
+                    <StackPanel Orientation="Horizontal" Width="200" Margin="375 0 0 0" HorizontalAlignment="Left" >
+                        <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" HorizontalAlignment="Center" Height="20" Width="80"  FontWeight="Normal" >Connect</Button>
+                        <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="80"  FontWeight="Normal"  >Disconnect</Button>
+                       
+                       
                     </StackPanel>
                 </Grid>
             </GroupBox>
         </StackPanel>
 
-        <StackPanel Name="TerminalWindow" VerticalAlignment="Bottom" Height="250">
+        <StackPanel Name="TerminalWindow" Grid.Column="0" VerticalAlignment="Bottom" Width="600" HorizontalAlignment="Left" Height="250">
             <GroupBox Header="Terminal" FontWeight="Bold" Margin="4 0 4 0" Height="248">
                 <StackPanel FocusManager.FocusedElement="{Binding ElementName=Input}">
-                    <TextBox IsEnabled="true" 
+                    <TextBox IsEnabled="true"
+                             Background="Black"
+                             Foreground="Green"
                              CaretIndex="0"
                              Text="{Binding Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                              TextWrapping="Wrap" 
                              Height="175" 
                              VerticalAlignment="Top" 
                              Margin="4 4 4 0"
+                             
                              FontWeight="Normal" 
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"></TextBox>
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                       
+                    </TextBox>
                     
                     <TextBox Text="{Binding Input , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Name="Input" 
+                             Background="Black" Foreground="Green"
                         AcceptsReturn="False" VerticalAlignment="Bottom" Margin="4 10 4 0" FontWeight="Normal"></TextBox>
 
-                    <Label Content="{Binding Status}" Margin="4 0 4 0" FontSize="11"></Label>
+                    <Label Content="{Binding Status}" Foreground="{Binding Color}" Margin="4 0 4 0" FontSize="11"></Label>
                 </StackPanel>
 
+            </GroupBox>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" >
+            <GroupBox Header="Script Buttons" Height="410" Width="160" >
+                <StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Button VerticalAlignment="Bottom" Command="{Binding ListDirectoryCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="80"  FontWeight="Normal">List Directory</Button>
+                    </ScrollViewer>
+                </StackPanel>
             </GroupBox>
         </StackPanel>
     </Grid>

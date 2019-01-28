@@ -1,10 +1,7 @@
 using System;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Forms;
+using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Renci.SshNet;
@@ -21,6 +18,7 @@ namespace SSH_Terminal.ViewModel
         private string _output;
         private string _input;
         private string _status;
+        private System.Windows.Media.Color _color;
 
         private SshClient _sshClient;
         private ShellStream _shellStreamSSH;
@@ -33,6 +31,7 @@ namespace SSH_Terminal.ViewModel
             _address = "143.176.230.43";
             _userName = "rishwi";
             _portNumber = "22";
+            Color = Color.FromRgb(0, 0, 0);
             Status = "Status : Not Connected";
             ThreadStart threadStart = new ThreadStart(RecvSSHData);
             Thread thread = new Thread(threadStart)
@@ -60,7 +59,7 @@ namespace SSH_Terminal.ViewModel
         {
             try
             {
-                _shellStreamSSH.Write(Input+ "\n");
+                _shellStreamSSH.Write(Input + "\n");
                 _shellStreamSSH.Flush();
                 Input = "";
             }
@@ -74,6 +73,7 @@ namespace SSH_Terminal.ViewModel
         {
             _sshClient.Disconnect();
             Output = "Disconnected from " + _address + "\n";
+            Color = Color.FromRgb(0, 0, 0);
             Status = "Status: Not connected";
         }
 
@@ -83,15 +83,17 @@ namespace SSH_Terminal.ViewModel
             {
                 _sshClient = new SshClient(_address, Convert.ToInt32(_portNumber), _userName, _password);
 
-                this._sshClient.ConnectionInfo.Timeout = TimeSpan.FromSeconds(120);
-                this._sshClient.Connect();
-
-                this._shellStreamSSH = this._sshClient.CreateShellStream("xterm-256color", 80, 160, 80, 160, 1024);
+                _sshClient.ConnectionInfo.Timeout = TimeSpan.FromSeconds(120);
+                _sshClient.Connect();
+                Password = "";
+                _shellStreamSSH = _sshClient.CreateShellStream("xterm-256color", 80, 160, 80, 160, 1024);
+                Color = Color.FromRgb(0, 255, 0);
                 Status = "Status: Connected to " + _address;
             }
             catch (Exception exp)
             {
-                this._status = "Status: cannot connect to " + _address;
+                Color = Color.FromRgb(255, 0, 0);
+                _status = "Status: cannot connect to " + _address;
                 System.Windows.MessageBox.Show("Error: " + exp.Message);
             }
         }
@@ -108,10 +110,10 @@ namespace SSH_Terminal.ViewModel
                         string data = this._shellStreamSSH.Read();
 
                         // remove ansi color codes
-                        data =  new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(data, "");
+                        data = new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(data, "");
 
                         Output += data;
-                        
+
                     }
                 }
                 catch
@@ -129,6 +131,16 @@ namespace SSH_Terminal.ViewModel
         public RelayCommand DisconnectCommand { get; }
         public RelayCommand EnterCommand { get; }
         public RelayCommand ListDirectoryCommand { get; }
+
+        public Color Color
+        {
+            get => _color;
+            set
+            {
+                _color = value;
+                RaisePropertyChanged("Color");
+            }
+        }
 
         public string Address
         {
@@ -149,7 +161,11 @@ namespace SSH_Terminal.ViewModel
         public string Password
         {
             get => _password;
-            set => _password = value;
+            set
+            {
+                _password = value;
+                RaisePropertyChanged("Password");
+            }
         }
 
         public string PortNumber
