@@ -40,8 +40,8 @@
                     <StackPanel Orientation="Horizontal" Width="200" Margin="375 0 0 0" HorizontalAlignment="Left" >
                         <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" HorizontalAlignment="Center" Height="20" Width="80"  FontWeight="Normal" >Connect</Button>
                         <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="80"  FontWeight="Normal"  >Disconnect</Button>
-                       
-                       
+
+
                     </StackPanel>
                 </Grid>
             </GroupBox>
@@ -63,9 +63,9 @@
                              FontWeight="Normal" 
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
-                       
+
                     </TextBox>
-                    
+
                     <TextBox Text="{Binding Input , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Name="Input" 
                              Background="Black" Foreground="Green"
                         AcceptsReturn="False" VerticalAlignment="Bottom" Margin="4 10 4 0" FontWeight="Normal"></TextBox>
@@ -78,11 +78,27 @@
 
         <StackPanel Grid.Column="1" >
             <GroupBox Header="Script Buttons" Height="410" Width="160" >
-                <StackPanel>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <Button VerticalAlignment="Bottom" Command="{Binding ListDirectoryCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="80"  FontWeight="Normal">List Directory</Button>
-                    </ScrollViewer>
-                </StackPanel>
+                <DataGrid AutoGenerateColumns="False" IsReadOnly="True" 
+                  ItemsSource="{Binding ListScript}" Margin="0,6,0,0" BorderBrush="#FF979494" 
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#FFF0E0E0" HeadersVisibility="Column"
+                  ScrollViewer.CanContentScroll="true" >
+                    <DataGrid.Columns>
+
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+
+                                    <Button Command="{Binding ScriptCommand}"
+                                    BorderThickness="0,0,0,1" BorderBrush="#FF999A9B" Foreground="White" Margin="2" 
+                                    HorizontalAlignment="Left" VerticalAlignment="Center" Width="140" Height="30" Content="{Binding Name}"
+                                    Background="#FF6F9BDA"></Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+
             </GroupBox>
         </StackPanel>
     </Grid>

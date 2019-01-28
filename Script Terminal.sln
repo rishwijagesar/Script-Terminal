@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSH Terminal", "SSH Terminal\SSH Terminal.csproj", "{0484C20E-7157-4547-A039-88E89BDD27B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Script Terminal", "SSH Terminal\Script Terminal.csproj", "{0484C20E-7157-4547-A039-88E89BDD27B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

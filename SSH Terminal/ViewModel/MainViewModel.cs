@@ -1,4 +1,6 @@
 using System;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Media;
@@ -20,9 +22,11 @@ namespace SSH_Terminal.ViewModel
         private string _status;
         private System.Windows.Media.Color _color;
 
-        private SshClient _sshClient;
+        public SshClient _sshClient;
         private ShellStream _shellStreamSSH;
-
+        private ScriptVM _scriptVM;
+        private ObservableCollection<ScriptVM> _listScript;
+        public SshCommand command;
 
         public MainViewModel()
         {
@@ -40,6 +44,7 @@ namespace SSH_Terminal.ViewModel
             };
 
             thread.Start();
+            ListScript = new ObservableCollection<ScriptVM>();
             ConnectCommand = new RelayCommand(Connect);
             DisconnectCommand = new RelayCommand(Disconnect);
             EnterCommand = new RelayCommand(Enter);
@@ -49,7 +54,7 @@ namespace SSH_Terminal.ViewModel
 
         private void ListDirectory()
         {
-            SshCommand command = _sshClient.CreateCommand("ls");
+            command = _sshClient.CreateCommand("ls");
             command.Execute();
             Output += "\n";
             Output += command.Result;
@@ -66,6 +71,40 @@ namespace SSH_Terminal.ViewModel
             catch
             {
 
+            }
+        }
+
+        private void Script()
+        {
+            var dir = @"C:\Documents\ScriptTerminal_Scripts";
+
+            if (!Directory.Exists(dir))
+            {  // if it doesn't exist, create
+                Directory.CreateDirectory(dir);
+            }
+            else
+            {
+                DirectoryInfo fileDir = new DirectoryInfo(@"C:\Documents\ScriptTerminal_Scripts");
+                FileInfo[] TXTFiles = fileDir.GetFiles("*.txt");
+
+                // if there are any txt files
+                if (TXTFiles.Length > 0)
+                {
+                    // loop through all txt files
+                    foreach (var file in TXTFiles)
+                    {
+                        if (file.Exists)
+                        {
+                            // create ScriptVM
+                            ListScript.Add(_scriptVM = new ScriptVM(this)
+                            {
+                                Name = file.Name.Replace(".txt", ""),
+                                Path = file.DirectoryName,
+                                Content = File.ReadAllText(file.DirectoryName + "\\" + file.Name)
+                            });
+                        }
+                    }
+                }
             }
         }
 
@@ -89,6 +128,8 @@ namespace SSH_Terminal.ViewModel
                 _shellStreamSSH = _sshClient.CreateShellStream("xterm-256color", 80, 160, 80, 160, 1024);
                 Color = Color.FromRgb(0, 255, 0);
                 Status = "Status: Connected to " + _address;
+
+                Script();
             }
             catch (Exception exp)
             {
@@ -131,6 +172,14 @@ namespace SSH_Terminal.ViewModel
         public RelayCommand DisconnectCommand { get; }
         public RelayCommand EnterCommand { get; }
         public RelayCommand ListDirectoryCommand { get; }
+        public ObservableCollection<ScriptVM> ListScript
+        {
+            get => _listScript; set
+            {
+                _listScript = value;
+                RaisePropertyChanged("ListScript");
+            }
+        }
 
         public Color Color
         {
