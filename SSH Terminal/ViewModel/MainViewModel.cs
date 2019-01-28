@@ -1,8 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
 using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -20,21 +22,21 @@ namespace SSH_Terminal.ViewModel
         private string _output;
         private string _input;
         private string _status;
+        private string _pathScripts;
+        private string _pathConnections;
         private System.Windows.Media.Color _color;
-
-        public SshClient _sshClient;
         private ShellStream _shellStreamSSH;
         private ScriptVM _scriptVM;
         private ObservableCollection<ScriptVM> _listScript;
+        private OpenFileDialog _openFileDialog;
         public SshCommand command;
+        public SshClient _sshClient;
 
         public MainViewModel()
         {
-            _sshClient = null;
-            _shellStreamSSH = null;
-            _address = "143.176.230.43";
-            _userName = "rishwi";
-            _portNumber = "22";
+
+            _pathScripts = @"C:\ScriptTerminal\Scripts";
+            _pathConnections = @"C:\ScriptTerminal\Connections";
             Color = Color.FromRgb(0, 0, 0);
             Status = "Status : Not Connected";
             ThreadStart threadStart = new ThreadStart(RecvSSHData);
@@ -48,16 +50,52 @@ namespace SSH_Terminal.ViewModel
             ConnectCommand = new RelayCommand(Connect);
             DisconnectCommand = new RelayCommand(Disconnect);
             EnterCommand = new RelayCommand(Enter);
-            ListDirectoryCommand = new RelayCommand(ListDirectory);
+            SaveConnectionCommand = new RelayCommand(SaveConnection);
+            OpenConnectionCommand = new RelayCommand(OpenConnection);
 
         }
 
-        private void ListDirectory()
+        private void OpenConnection()
         {
-            command = _sshClient.CreateCommand("ls");
-            command.Execute();
-            Output += "\n";
-            Output += command.Result;
+
+            _openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = _pathConnections,
+                Title = "Open Connection File",
+                Filter = "Text|*.txt"
+            };
+            if (_openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var fileName = _openFileDialog.FileName;
+                Address = File.ReadLines(fileName).ElementAtOrDefault(0);
+                UserName = File.ReadLines(fileName).ElementAtOrDefault(1);
+                PortNumber = File.ReadLines(fileName).ElementAtOrDefault(2);
+            }
+        }
+
+        private void SaveConnection()
+        {
+            if (_address != null || _userName != null && _portNumber != null)
+            {
+                if (!Directory.Exists(_pathConnections))
+                {  // if it doesn't exist, create
+                    Directory.CreateDirectory(_pathConnections);
+                }
+
+                if (!File.Exists(_address + ".txt"))
+                {
+                    File.WriteAllText(Path.Combine(_pathConnections, _address + ".txt"), _address + "\n" + _userName + "\n" + _portNumber);
+                    Output += "Connection " + _address + " is succesfully saved!";
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("File will be overwritten");
+                }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Some fields are empty");
+            }
         }
 
         private void Enter()
@@ -70,50 +108,62 @@ namespace SSH_Terminal.ViewModel
             }
             catch
             {
-
             }
         }
 
+        // read script
         private void Script()
         {
-            var dir = @"C:\Documents\ScriptTerminal_Scripts";
-
-            if (!Directory.Exists(dir))
+            if (!Directory.Exists(_pathScripts))
             {  // if it doesn't exist, create
-                Directory.CreateDirectory(dir);
+                Directory.CreateDirectory(_pathScripts);
             }
-            else
-            {
-                DirectoryInfo fileDir = new DirectoryInfo(@"C:\Documents\ScriptTerminal_Scripts");
-                FileInfo[] TXTFiles = fileDir.GetFiles("*.txt");
 
-                // if there are any txt files
-                if (TXTFiles.Length > 0)
+            DirectoryInfo fileDir = new DirectoryInfo(_pathScripts);
+            FileInfo[] TXTFiles = fileDir.GetFiles("*.txt");
+
+            // if there are any txt files
+            NewMethod(TXTFiles);
+
+        }
+
+        // check if there is any file in the folder
+        private void NewMethod(FileInfo[] TXTFiles)
+        {
+            if (TXTFiles.Length > 0)
+            {
+                // loop through all txt files
+                foreach (var file in TXTFiles)
                 {
-                    // loop through all txt files
-                    foreach (var file in TXTFiles)
+                    if (file.Exists)
                     {
-                        if (file.Exists)
+                        // create ScriptVM
+                        ListScript.Add(_scriptVM = new ScriptVM(this)
                         {
-                            // create ScriptVM
-                            ListScript.Add(_scriptVM = new ScriptVM(this)
-                            {
-                                Name = file.Name.Replace(".txt", ""),
-                                Path = file.DirectoryName,
-                                Content = File.ReadAllText(file.DirectoryName + "\\" + file.Name)
-                            });
-                        }
+                            Name = file.Name.Replace(".txt", ""),
+                            Path = file.DirectoryName,
+                            Content = File.ReadAllText(file.DirectoryName + "\\" + file.Name)
+                        });
                     }
                 }
             }
         }
 
+        // disconnect method
         private void Disconnect()
         {
-            _sshClient.Disconnect();
-            Output = "Disconnected from " + _address + "\n";
-            Color = Color.FromRgb(0, 0, 0);
-            Status = "Status: Not connected";
+            try
+            {
+                _sshClient.Disconnect();
+                Output += "Disconnected from " + _address + "\n";
+                Color = Color.FromRgb(0, 0, 0);
+                Status = "Status: Not connected";
+                ListScript.Clear();
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("Error: There is no connection available to close");
+            }
         }
 
         private void Connect()
@@ -128,7 +178,6 @@ namespace SSH_Terminal.ViewModel
                 _shellStreamSSH = _sshClient.CreateShellStream("xterm-256color", 80, 160, 80, 160, 1024);
                 Color = Color.FromRgb(0, 255, 0);
                 Status = "Status: Connected to " + _address;
-
                 Script();
             }
             catch (Exception exp)
@@ -139,6 +188,7 @@ namespace SSH_Terminal.ViewModel
             }
         }
 
+        // receive ssh data
         private void RecvSSHData()
         {
             while (true)
@@ -149,29 +199,25 @@ namespace SSH_Terminal.ViewModel
                     {
                         // read data from shellstream
                         string data = this._shellStreamSSH.Read();
-
                         // remove ansi color codes
                         data = new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(data, "");
-
                         Output += data;
-
                     }
                 }
                 catch
                 {
-
                 }
                 System.Threading.Thread.Sleep(200);
             }
         }
-
 
         #region Properties
 
         public RelayCommand ConnectCommand { get; }
         public RelayCommand DisconnectCommand { get; }
         public RelayCommand EnterCommand { get; }
-        public RelayCommand ListDirectoryCommand { get; }
+        public RelayCommand SaveConnectionCommand { get; }
+        public RelayCommand OpenConnectionCommand { get; }
         public ObservableCollection<ScriptVM> ListScript
         {
             get => _listScript; set
@@ -204,7 +250,11 @@ namespace SSH_Terminal.ViewModel
         public string UserName
         {
             get => _userName;
-            set => _userName = value;
+            set
+            {
+                _userName = value;
+                RaisePropertyChanged("UserName");
+            }
         }
 
         public string Password
@@ -220,7 +270,11 @@ namespace SSH_Terminal.ViewModel
         public string PortNumber
         {
             get => _portNumber;
-            set => _portNumber = value;
+            set
+            {
+                _portNumber = value;
+                RaisePropertyChanged("PortNumber");
+            }
         }
         public string Output
         {

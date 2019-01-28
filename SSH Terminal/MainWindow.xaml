@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SSH_Terminal"
         mc:Ignorable="d"
-        Title="Script Terminal" Height="450" ResizeMode="NoResize" MaxHeight="450" Width="800" MaxWidth="800" 
+        Title="Script Terminal v1" Height="450" ResizeMode="NoResize" MaxHeight="450" Width="800" MaxWidth="800" 
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding EnterCommand}"/>
@@ -19,7 +19,7 @@
         <StackPanel Name="SSHConnector" Grid.Column="0" VerticalAlignment="Top" Height="150" MaxWidth="600" HorizontalAlignment="Left" MinWidth="600">
             <GroupBox Header="SSH Connector" Margin=" 4 0 4 0" Height="150" FontWeight="Bold">
                 <Grid>
-                    <StackPanel Orientation="Vertical" Width="375" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Vertical" Width="360" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
                             <Label Content="Host Address :" Width="120" FontWeight="Normal"></Label>
                             <TextBox Text="{Binding Address}" FontWeight="Normal" Width="150" Height="20" Name="HostAddress"></TextBox>
@@ -30,18 +30,22 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
                             <Label FontWeight="Normal" Content="Password :" Width="120"></Label>
-                            <TextBox  FontWeight="Normal" Text="{Binding Password}" Width="150" Height="20" Name="Password" ></TextBox>
+                            <TextBox  FontWeight="Normal" Text="{Binding Password}" Foreground="White" Width="150" Height="20" Name="Password" ></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="4 4 4 4">
                             <Label  FontWeight="Normal" Content="Port Number :" Width="120"></Label>
                             <TextBox  FontWeight="Normal" Text="{Binding PortNumber}" Width="150" Height="20" Name="PortNumber"></TextBox>
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Width="200" Margin="375 0 0 0" HorizontalAlignment="Left" >
-                        <Button VerticalAlignment="Bottom" Command="{Binding ConnectCommand}" HorizontalAlignment="Center" Height="20" Width="80"  FontWeight="Normal" >Connect</Button>
-                        <Button VerticalAlignment="Bottom" Command="{Binding DisconnectCommand}" HorizontalAlignment="Center" Margin="8 0 0 0" Height="20" Width="80"  FontWeight="Normal"  >Disconnect</Button>
-
-
+                    <StackPanel Orientation="Vertical" Width="220" Margin="360 8 0 0" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" Width="200" Margin="0 0 0 0" HorizontalAlignment="Left" >
+                            <Button VerticalAlignment="Top" Command="{Binding ConnectCommand}" HorizontalAlignment="Center" Height="20" Width="97"  FontWeight="Normal" >Connect</Button>
+                            <Button VerticalAlignment="Top" Command="{Binding DisconnectCommand}" HorizontalAlignment="Center" Margin="4 0 0 0" Height="20" Width="97"  FontWeight="Normal">Disconnect</Button>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Width="200" Orientation="Horizontal" Margin="0 4 0 0" >
+                            <Button VerticalAlignment="Top" Command="{Binding SaveConnectionCommand}" HorizontalAlignment="Center" Height="20" Width="97" FontWeight="Normal">Save Connection</Button>
+                            <Button VerticalAlignment="Top" Command="{Binding OpenConnectionCommand}" HorizontalAlignment="Center" Height="20" Width="97" FontWeight="Normal" Margin="4 0 0 0">Open Connection</Button>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </GroupBox>
@@ -58,12 +62,10 @@
                              TextWrapping="Wrap" 
                              Height="175" 
                              VerticalAlignment="Top" 
-                             Margin="4 4 4 0"
-                             
+                             Margin="4 4 4 0"                             
                              FontWeight="Normal" 
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
-
                     </TextBox>
 
                     <TextBox Text="{Binding Input , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Name="Input" 
@@ -79,19 +81,16 @@
         <StackPanel Grid.Column="1" >
             <GroupBox Header="Script Buttons" Height="410" Width="160" >
                 <DataGrid AutoGenerateColumns="False" IsReadOnly="True" 
-                  ItemsSource="{Binding ListScript}" Margin="0,6,0,0" BorderBrush="#FF979494" 
-                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#FFF0E0E0" HeadersVisibility="Column"
+                  ItemsSource="{Binding ListScript}" Margin="0,6,0,0"  
+                  GridLinesVisibility="Horizontal"  HeadersVisibility="Column"
                   ScrollViewer.CanContentScroll="true" >
                     <DataGrid.Columns>
-
                         <DataGridTemplateColumn Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-
-                                    <Button Command="{Binding ScriptCommand}"
-                                    BorderThickness="0,0,0,1" BorderBrush="#FF999A9B" Foreground="White" Margin="2" 
-                                    HorizontalAlignment="Left" VerticalAlignment="Center" Width="140" Height="30" Content="{Binding Name}"
-                                    Background="#FF6F9BDA"></Button>
+                                    <Button Command="{Binding ScriptCommand}"    
+                                            HorizontalAlignment="Left" VerticalAlignment="Center" Width="140" Height="30" 
+                                            Content="{Binding Name}"></Button>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
