@@ -52,7 +52,15 @@ namespace SSH_Terminal.ViewModel
             EnterCommand = new RelayCommand(Enter);
             SaveConnectionCommand = new RelayCommand(SaveConnection);
             OpenConnectionCommand = new RelayCommand(OpenConnection);
+            BreakCommand = new RelayCommand(Break);
 
+        }
+
+        private void Break()
+        {
+            command = _sshClient.CreateCommand("\x03");
+            command.Execute();
+            Output += command.Result;
         }
 
         private void OpenConnection()
@@ -218,6 +226,7 @@ namespace SSH_Terminal.ViewModel
         public RelayCommand EnterCommand { get; }
         public RelayCommand SaveConnectionCommand { get; }
         public RelayCommand OpenConnectionCommand { get; }
+        public RelayCommand BreakCommand { get; }
         public ObservableCollection<ScriptVM> ListScript
         {
             get => _listScript; set
