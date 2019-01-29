@@ -24,11 +24,8 @@ namespace SSH_Terminal.ViewModel
         // execute script
         private void Script()
         {           
-            _mainViewModel.command = _mainViewModel._sshClient.CreateCommand("shutdown -h now");
-            _mainViewModel.command.Execute();
-            _mainViewModel.Output += "\n";
-            _mainViewModel.Output += _mainViewModel.command.Result;
-
+            _mainViewModel._shellStreamSSH.Write(_mainViewModel.Input+ _content +"\n");
+            _mainViewModel._shellStreamSSH.Flush();
         }
 
         public RelayCommand ScriptCommand { get; }

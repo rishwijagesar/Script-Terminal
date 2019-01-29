@@ -25,7 +25,7 @@ namespace SSH_Terminal.ViewModel
         private string _pathScripts;
         private string _pathConnections;
         private System.Windows.Media.Color _color;
-        private ShellStream _shellStreamSSH;
+        public ShellStream _shellStreamSSH;
         private ScriptVM _scriptVM;
         private ObservableCollection<ScriptVM> _listScript;
         private OpenFileDialog _openFileDialog;
